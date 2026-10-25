@@ -35,14 +35,17 @@ metadata patch so the plugin can be installed and smoke-tested from source contr
 - Headless load smoke: entry imports under Node 24; the DSH version gate passes after this
   patch; the row stays `pending (waiting for service: connection)` because headless has no
   web connection service — expected, not a failure.
-- Real web-host activation (plugin apply + client module + native “通知与控制” panel) has
-  **not** been verified yet; do that after restarting `dsh web` and report failures here.
+- Real web-host activation on 2026-10-25: installed into the live `web` profile and the host
+  hot-loaded it without a process restart. `dsh --profile web --dump-config` composes the
+  `dsh-notifier` row; the plugin's admin server answers `200` on `http://127.0.0.1:8104/`
+  (title `dsh-notifier 管理台`) and `401` for unauthenticated `/api/*`. Native “通知与控制”
+  panel rendering and real QQ provider flows are still pending.
 
 ## Install
 
 ```powershell
 dsh plugin --profile web add "github:xiaobizahizhi/dsh-notifier#dsh-021-compat"
-# restart dsh web afterwards
+# 0.2.1-rc.2 hot-loaded the row on install; if a host does not hot-reload, restart dsh web.
 ```
 
 ## Upstream relationship

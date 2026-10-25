@@ -42,14 +42,14 @@ The optional peer marker is `@deepseek-ai/dsh-session`. `scripts/verify-host-com
 | `0.1.7-alpha.2` | source/artifact seams verified | required client packages present | not claimed as a fresh real-host visual walkthrough in v0.12 release evidence | **contract/source verified** |
 | `0.1.7-rc.1` | source/artifact seams verified | required client packages present | not claimed as a fresh real-host visual walkthrough in v0.12 release evidence | **contract/source verified** |
 | `0.1.7-rc.2` | compatible with current Session/Message contract | required client packages/slots present | Sidebar/Main render, setup wizard, save/test, 28 channels, Hot Apply and fail-closed invalid save exercised in real Host | **host smoke + visual/interaction verified** |
-| `0.2.1-rc.2` | fork-local seam audit: `tools` / `agents` / `connection` services and the 7 consumed Host events exist in the 0.2.1-rc.2 type surface | required client packages present in the installed 0.2.1-rc.2 surface | not yet exercised in a real Host; plan is isolated-DSH_HOME web smoke plus restart verification | **fork compatibility claim (host smoke pending)** |
+| `0.2.1-rc.2` | fork-local seam audit: `tools` / `agents` / `connection` services and the 7 consumed Host events exist in the 0.2.1-rc.2 type surface | required client packages present in the installed 0.2.1-rc.2 surface | 2026-10-25 fork host smoke: plugin activated in a live 0.2.1-rc.2 web host via hot install; admin console `200` on `127.0.0.1:8104`, unauthenticated `/api/*` `401`; native panel and QQ provider flows pending | **fork compatibility claim (host smoke: plugin apply + admin console only)** |
 | `0.1.0-rc.6` | historical only | current Native surface not re-certified | old historical plugin verification only | **unverified for v0.12** |
 
 Peer range: `0.1.7-alpha.1 || 0.1.7-alpha.2 || 0.1.7-rc.1 || 0.1.7-rc.2 || 0.2.1-rc.2`.
 
 No row is `real-device-verified`; every row is source/artifact or host-smoke evidence.
 
-**Fork note:** the `0.2.1-rc.2` row is a fork-local compatibility claim (`xiaobizahizhi/dsh-notifier`, branch `dsh-021-compat`), not upstream verification. It is based on a type-surface seam audit plus a headless plugin-load smoke (the row stays pending there because headless has no `connection` service); real web-host activation on 0.2.1-rc.2 is still pending. Upstream does not ship or support this row. Remove it when upstream declares 0.2.x support.
+**Fork note:** the `0.2.1-rc.2` row is a fork-local compatibility claim (`xiaobizahizhi/dsh-notifier`, branch `dsh-021-compat`), not upstream verification. It is based on a type-surface seam audit, a headless plugin-load smoke (the row stays pending there because headless has no `connection` service), and a 2026-10-25 live-host smoke in which the plugin hot-loaded into a running 0.2.1-rc.2 web host and served its authenticated admin console. Native panel rendering and real QQ provider flows remain pending. Upstream does not ship or support this row. Remove it when upstream declares 0.2.x support.
 
 ### Inbound file attachment boundary
 

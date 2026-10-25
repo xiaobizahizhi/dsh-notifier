@@ -7,6 +7,7 @@
 - `package.json`: peer range and `dshWorkshop.compatibility.dshVersions` now also accept `0.2.1-rc.2`; `@tencent-connect/qqbot-connector` moved into `optionalDependencies` so the QQ official QR login works after a normal install (it was documented as optional but not declared).
 - `docs/compatibility-matrix.md`: added a fork-local `0.2.1-rc.2` row. This is a fork compatibility claim, not upstream verification; real-host smoke is still pending (see `FORK-NOTES.md`).
 - `test/host-compat-matrix.test.mjs`: locks the fork-local verified list (regression tests for the three-way manifest/matrix agreement).
+- 2026-10-25 live host smoke: installed into the running `web` profile on DSH `0.2.1-rc.2`; the host hot-loaded the plugin (`--dump-config` composes the row) and its admin console serves `200` at `127.0.0.1:8104` with unauthenticated `/api/*` returning `401`. Native panel + QQ provider flows still pending.
 - No runtime source changes in this patch.
 
 ## [0.13.1] - 2026-09-26（v0.13 follow-up release）
