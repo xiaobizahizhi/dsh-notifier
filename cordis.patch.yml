@@ -12,9 +12,9 @@
         debounceMs: 10000
         summaryMaxChars: 500
         channels: []
-        # 零 YAML 首访（admin-zero-config-onboarding）：新安装默认开启本机管理台，
-        # 用户打开终端打印的链接即可配置通知渠道，无需先写 YAML。
-        # 程序化调用 resolveConfig({}) 仍保持 admin.enabled=false 的兼容契约——
-        # 本补丁只影响经 cordis.patch.yml 安装的部署形态。
+        # 方案 0（个人 fork 隐形模式）：关闭本机管理台。本分支不注册任何前端入口
+        # （main / sidebar.panellist / activation），通知与 QQ 回传全在后台工作；
+        # 渠道配置走 profile 的 cordis.patch.yml 覆盖本行 config.channels，
+        # QQ 官方扫码用 scripts/channel-login.mjs qq（需要可选依赖 qqbot-connector）。
         admin:
-          enabled: true
+          enabled: false

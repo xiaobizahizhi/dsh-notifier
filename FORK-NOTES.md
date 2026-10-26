@@ -41,6 +41,19 @@ metadata patch so the plugin can be installed and smoke-tested from source contr
   (title `dsh-notifier 管理台`) and `401` for unauthenticated `/api/*`. Native “通知与控制”
   panel rendering and real QQ provider flows are still pending.
 
+## 方案 0：隐形模式（declared 2026-10-26）
+
+本 fork 的 `dsh-021-compat` 分支在 2026-10-26 追加「隐形模式」：
+
+- `client.js` 不再注册 `main`、`sidebar.panellist`、`plugins.bundle.activation`，只保留
+  `plugins.bundle.config`（Plugins 页里一张状态卡）。插件在后台跑通知/审批/提问/QQ 回传，
+  **不会接管主界面，也就不存在「进得去退不出来」的返回键问题**。
+- `cordis.patch.yml` 默认 `admin.enabled: false`，不再监听 `127.0.0.1:8104`。
+- 配置方式改为「配置即代码」：在 profile 的 `cordis.patch.yml` 覆盖该行
+  `config.channels`（QQ 渠道 appId/appSecret/targetType/userId），字段表见
+  `src/config.mjs` 的 FIELD_HINTS；QQ 官方扫码用
+  `node node_modules/dsh-notifier/scripts/channel-login.mjs qq`。
+
 ## Install
 
 ```powershell

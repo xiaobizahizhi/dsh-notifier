@@ -964,14 +964,6 @@ window.__ModuleLoader__.load({
       return h('div', { className: 'dn-pluginConfig' },
         h('strong', null, ready ? t('pluginReady') : t('noChannels')),
         h('p', null, ready ? resolveText(ctx, state.home?.summary?.detail) : t('noChannelsHint')),
-        h('div', { className: 'dn-formActions' },
-          h(Button, {
-            kind: 'primary',
-            onClick: () => {
-              try { ctx.layout.selectPanel(PANEL_ID) } catch (error) { controller.reportError(error) }
-              controller.navigate({ kind: ready ? 'home' : 'channels', setup: !ready })
-            },
-          }, ready ? t('openControl') : t('setupFirst'))),
         h('p', { className: 'dn-note' }, t('pluginAdvanced')))
     }
 
@@ -1032,7 +1024,7 @@ window.__ModuleLoader__.load({
     `
 
     return {
-      inject: ['slots', 'connection', 'locale', 'layout'],
+      inject: ['slots', 'connection', 'locale'],
       apply(ctx) {
         ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-notifier: native locale')
         const style = document.createElement('style')
@@ -1057,31 +1049,16 @@ window.__ModuleLoader__.load({
           message: resolveText(ctx, { zh: zh.renderFailed, en: en.renderFailed }),
           retry: resolveText(ctx, { zh: zh.retry, en: en.retry }),
         }, child)
-        const Main = () => boundary(h(MainPanel, { controller, ctx }))
         const Config = props => boundary(h(PluginConfig, { ...props, controller, ctx }))
-        const ActivationView = props => boundary(h(Activation, { ...props, ctx }))
 
-        ctx.slots.inject('main', () => ctx.slots.register({
-          name: 'main',
-          key: PANEL_ID,
-        }, Main))
-        // label 必须是 thunk：宿主 resolveSlotLabel 只对函数求值（`typeof label === 'function' ? label() : label`），
-        // 传普通对象会被原样当 React child 渲染 → "Objects are not valid as a React child"，
-        // 直接崩掉整个 sidebar slot（2026-09-25 真机 0.1.7-rc.2 复现：data-slot-error="sidebar"）。
-        ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-          name: 'sidebar.panellist',
-          id: PANEL_ID,
-          order: 20,
-          label: () => resolveText(ctx, { en: 'Notify & Control', zh: '通知与控制' }),
-        }, SidebarIcon))
+        // 方案 0（个人 fork 隐形模式）：不注册 main / sidebar.panellist /
+        // plugins.bundle.activation。插件只在后台跑通知与 QQ 回传，不接管主界面，
+        // 因此不存在「打开后没有返回键」的问题；渠道配置走 profile 的
+        // cordis.patch.yml，管理台默认关闭（见同目录 cordis.patch.yml）。
         ctx.slots.inject('plugins.bundle.config', () => ctx.slots.register({
           name: 'plugins.bundle.config',
           key: 'dsh-notifier',
         }, Config))
-        ctx.slots.inject('plugins.bundle.activation', () => ctx.slots.register({
-          name: 'plugins.bundle.activation',
-          key: 'dsh-notifier',
-        }, ActivationView))
       },
     }
   },
