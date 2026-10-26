@@ -54,6 +54,16 @@ metadata patch so the plugin can be installed and smoke-tested from source contr
   `src/config.mjs` 的 FIELD_HINTS；QQ 官方扫码用
   `node node_modules/dsh-notifier/scripts/channel-login.mjs qq`。
 
+## 方案 0 追加：模型不可见（declared 2026-10-26）
+
+- 不再注册任何模型可见工具：`notify`、`notify_test`、`ask_user` 全部移除。
+- QQ 通知只来自宿主事件（`turn/end`、`approval/asked`、`agent/error`、心跳/卡住/摘要），
+  模型既看不到这些工具，也无法主动发起推送。
+- 远程提问只走宿主原生 `ask_user_question` 的 `user-questions/request` waterfall 桥接，
+  模型只看到宿主标准工具，不知道 dsh-notifier 存在。
+- 远程文本会话（QQ 文本 → 会话 followup/inject）仍保留：模型只看到普通用户消息，
+  不知道来源插件。
+
 ## Install
 
 ```powershell

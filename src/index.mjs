@@ -9,7 +9,6 @@ import { resolveAdminToken } from './assembly/admin-token.mjs'
 import { resolveInboundSignals } from './assembly/inbound-signals.mjs'
 import { createNotifier } from './notify.mjs'
 import { createEventListener } from './event-listener.mjs'
-import { registerNotifyTool, registerNotifyTestTool } from './tool-register.mjs'
 import { createLedger, yesterdayWindow } from './ledger.mjs'
 // 阶段 4/5：inbound 回传栈（远程审批 + 会话路由）
 import { createStore, defaultStateDir } from './inbound/store.mjs'
@@ -21,7 +20,7 @@ import { createInboundBus } from './inbound/bus.mjs'
 import { createInboundChannelRegistry } from './assembly/inbound-channels.mjs'
 import { disposeAll } from './assembly/lifecycle.mjs'
 import { registerApprovalHandler } from './approval/router.mjs'
-import { createQuestionBridge, registerAskUserTool } from './questions/router.mjs'
+import { createQuestionBridge } from './questions/router.mjs'
 import { createNativeQuestionBridge } from './host/native-questions.mjs'
 import { registerConversationRouter } from './inbound/conversation.mjs'
 // v0.5：动作闭环（通知按钮 → 内置处置动作）
@@ -399,14 +398,9 @@ export function apply(ctx, config = {}) {
     interactive: () => interactiveRaw,
     onHostEvents: (registrar) => { hostEventsRegistrar = registrar }, // 诊断快照外泄（提交7）
   }))
-  const disposeTool = registerNotifyTool(ctx, notifier, {
-    rateLimitPerMinute: resolved.toolRateLimitPerMinute,
-    router,
-    channelTypes: () => outboundSource.types(),
-  })
-  if (disposeTool != null) disposers.push(disposeTool)
-  const disposeTestTool = registerNotifyTestTool(ctx, notifier, { rateLimitPerMinute: resolved.toolRateLimitPerMinute, strings })
-  if (disposeTestTool != null) disposers.push(disposeTestTool)
+  // 方案 0（个人 fork）：模型不可见——不注册 notify / notify_test 工具。
+  // 所有 QQ 通知只来自宿主事件（turn/end、approval/asked、agent/error、心跳/卡住/摘要），
+  // 模型既看不到这些工具，也无法主动发起推送。
 
   // 启动期晨报：昨日有记录且今天还没发过 → 推一次摘要（passive 级，走正常路由）。
   // Commit20：守卫必须看 **digest.enabled**（ledgerEnabled），而非「账本存在」——账本现在
@@ -679,11 +673,8 @@ export function apply(ctx, config = {}) {
           logger,
           config: resolved.questions,
         }, strings)
-        const disposeAskTool = registerAskUserTool(ctx, questionsBridge, {
-          rateLimitPerMinute: resolved.questions.rateLimitPerMinute,
-          defaultTimeoutMs: resolved.questions.timeoutMs,
-        })
-        if (disposeAskTool !== null) disposers.push(disposeAskTool)
+        // 方案 0（个人 fork）：不注册 ask_user 工具；远程提问只走宿主原生 ask_user_question
+        // 的 user-questions/request waterfall 桥接（模型只认得宿主标准工具）。
         questionsBridge.attach()
         disposers.push(() => questionsBridge.dispose())
         // v0.10 宿主原生提问桥（任务书 3.2）：经宿主公开 seam 桥接原生 ask_user_question；
@@ -982,7 +973,7 @@ export function apply(ctx, config = {}) {
   })
 
   if (outboundSource.types().length === 0) {
-    warn(`未配置任何可用渠道（已跳过 ${resolved.skipped.length} 个配置项），事件推送与 notify 工具将无操作；可在 DSH Native Control Surface 或 profile 配置 channels`)
+    warn(`未配置任何可用渠道（已跳过 ${resolved.skipped.length} 个配置项），事件推送将无操作；可在 profile 配置 channels`)
   } else {
     warn(`已启用渠道：${outboundSource.types().join('、')}`)
   }
@@ -990,7 +981,7 @@ export function apply(ctx, config = {}) {
   return resolved
 }
 
-export { resolveConfig, createNotifier, createEventListener, registerNotifyTool }
+export { resolveConfig, createNotifier, createEventListener }
 export { maskChannelConfig, CHANNEL_TYPES } from './config.mjs'
 export { NotifyError, ERROR_CODES } from './adapters/_shared.mjs'
 // 阶段 4/5：inbound 回传栈（供测试与其它插件复用）
@@ -1016,7 +1007,7 @@ export { PUBLIC_API_VERSION, createPublicFacade, composeOnSend, deepFreeze } fro
 // 阶段 6：账本 / 健康自检 / 限流（供测试与其它插件复用）
 export { createLedger, yesterdayWindow, classifyTitle, composeDigest } from './ledger.mjs'
 export { runChannelTest, TEST_MESSAGE } from './health.mjs'
-export { createRateLimiter } from './tool-register.mjs'
+export { createRateLimiter, registerNotifyTool } from './tool-register.mjs'
 // v0.3.2：路由引擎（双向解析链 + 会话台账；供测试、CLI 与其它插件复用）
 export { createAgentRouter } from './routing/agent-router.mjs'
 export { createSessionRegistry, workspaceOf } from './routing/session-registry.mjs'

@@ -7,6 +7,7 @@
 - `package.json`: peer range and `dshWorkshop.compatibility.dshVersions` now also accept `0.2.1-rc.2`; `@tencent-connect/qqbot-connector` moved into `optionalDependencies` so the QQ official QR login works after a normal install (it was documented as optional but not declared).
 - `docs/compatibility-matrix.md`: added a fork-local `0.2.1-rc.2` row. This is a fork compatibility claim, not upstream verification; the 2026-10-25 live-host smoke is recorded in `FORK-NOTES.md`.
 - `test/host-compat-matrix.test.mjs`: locks the fork-local verified list (regression tests for the three-way manifest/matrix agreement).
+- 2026-10-26 模型不可见（方案 0 追加）：移除 `notify` / `notify_test` / `ask_user` 三个模型可见工具的注册；QQ 通知只来自宿主事件，远程提问只走原生 `ask_user_question` 的 host waterfall，模型不知道本插件存在。`tool-register.mjs` / `questions/router.mjs` 的导出保留（测试与其它插件可复用），仅装配层不再注册。
 - 2026-10-25 live host smoke: installed into the running `web` profile on DSH `0.2.1-rc.2`; the host hot-loaded the plugin (`--dump-config` composes the row) and its admin console serves `200` at `127.0.0.1:8104` with unauthenticated `/api/*` returning `401`. Native panel + QQ provider flows still pending.
 - 2026-10-26 方案 0「隐形模式」：`client.js` 不再注册 `main` / `sidebar.panellist` / `plugins.bundle.activation`，只保留 Plugins 页的 `plugins.bundle.config` 状态卡（不接管主界面，因此没有「打开后无返回键」的问题）；`cordis.patch.yml` 默认 `admin.enabled: false`，渠道改为 profile 配置 + CLI 扫码。运行时源改动仅限 `client.js` 注册段与 `cordis.patch.yml`。
 

@@ -45,8 +45,8 @@ function bootCtx() {
 test('apply: 空配置不崩启动，只 warn', () => {
   const { ctx, warnings, defs } = bootCtx()
   apply(ctx, {})
-  // 阶段 6：notify 之外还注册 notify_test（健康自检）
-  assert.deepEqual(defs.map((def) => def.name).sort(), ['notify', 'notify_test'], '注册 notify + notify_test 工具')
+  // 方案 0（个人 fork）：不再注册 notify / notify_test / ask_user 等任何模型可见工具，
+  assert.deepEqual(defs, [], '方案 0：不注册任何模型可见工具')
   assert.ok(warnings.some((w) => /未配置任何可用渠道/.test(w)))
 })
 
@@ -59,7 +59,7 @@ test('apply: 部分渠道配置缺失时逐个 warn，可用渠道照常启用',
       { type: 'webhook', url: 'http://127.0.0.1:1/hook' },
     ],
   })
-  assert.deepEqual(defs.map((def) => def.name).sort(), ['notify', 'notify_test'])
+  assert.deepEqual(defs, [], '方案 0：不注册任何模型可见工具')
   assert.ok(warnings.some((w) => /渠道 "telegram" 跳过.*telegram 未配置/.test(w)))
   assert.ok(warnings.some((w) => /渠道 "bogus" 跳过.*未知渠道类型/.test(w)))
   assert.ok(warnings.some((w) => /已启用渠道：webhook/.test(w)))
@@ -174,7 +174,7 @@ test('v0.6.1 inbound 逐通道隔离：telegram 装配炸了不崩 apply，其�
   assert.ok(warnings.some((w) => /inbound:telegram 装配失败，已跳过/.test(w)),
     `应点名 telegram 装配失败（实际：${warnings.join(' | ')}）`)
   assert.ok(!warnings.some((w) => /inbound 已启动：telegram/.test(w)), 'telegram 不应有启动成功告警')
-  assert.deepEqual(defs.map((def) => def.name).sort(), ['ask_user', 'notify', 'notify_test'], '出站工具照常注册（apply 未被拖垮）')
+  assert.deepEqual(defs, [], '方案 0：不注册任何模型可见工具（apply 未被拖垮）')
 })
 
 // ————————————————— v0.8.7 B1：引导码文件交付（LEAK-2） —————————————————
